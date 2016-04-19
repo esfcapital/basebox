@@ -1,0 +1,5 @@
+---
+- name: Create KVM basebox 
+  hosts: localhost
+  roles:
+    - basebox 

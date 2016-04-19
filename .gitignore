@@ -1,0 +1,4 @@
+*.retry
+.~lock*
+tmp*
+.vagrant
