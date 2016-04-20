@@ -35,10 +35,8 @@ d-i pkgsel/upgrade select full-upgrade
 d-i pkgsel/update-policy select unattended-upgrades
 # Install OpenSSH server
 tasksel tasksel/first multiselect openssh-server
-# Install acpid
-d-i pkgsel/include string acpid
-# Install python
-d-i pkgsel/include python
+# Install acpid and python
+d-i pkgsel/include string acpid python
 # Install GRUB2
 d-i grub-installer/only_debian boolean true
 # Avoid that last message about the install being complete
