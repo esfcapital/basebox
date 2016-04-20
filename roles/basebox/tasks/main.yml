@@ -8,7 +8,7 @@
   debug: msg={{virt_vms}}
 
 - name: Copy Preseed to tmp
-  local_action: template src={{basebox.preseed}} dest=/tmp/{{basebox.preseed}}
+  local_action: template src={{basebox.preseed}}.j2 dest=/tmp/{{basebox.preseed}}
 
 - name: Ensure that the disks directory exists
   file: name={{basebox.disk.path}} state=directory
@@ -26,7 +26,7 @@
              --graphics vnc
              --{{basebox.virt_hypervisor}}
              --virt-type {{ basebox.virt_type }}
-             --disk size={{basebox.disk.size}},path={{basebox.disk.path}}/{{basebox.name}}.img
+             --disk size={{basebox.disk.size}},format={{basebox.disk.format}},path={{basebox.disk.path}}/{{basebox.name}}.img
              --noautoconsole
   when: basebox.name not in virt_vms.list_vms
   register: basebox_create 
@@ -54,5 +54,4 @@
     
 - name: Status message
   debug: msg="Your image is currently being built.  Please open you virt-manager to see progress"
-
 
