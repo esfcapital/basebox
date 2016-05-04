@@ -17,7 +17,7 @@
   local_action: command /usr/bin/virt-install --name {{basebox.name}}
              -r {{ basebox.mem }}
              --os-type {{basebox.os.type}}
-             --os-variant {{basebox.os.variant}}
+             --os-variant {{basebox.os.variant[ansible_lsb.major_release]}}
              --vcpus {{ basebox.cpu }}
              --location {{basebox.location}}
              --initrd-inject /tmp/{{basebox.preseed}}
