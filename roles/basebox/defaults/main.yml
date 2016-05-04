@@ -14,7 +14,9 @@ basebox:
   extra_args: "locale=en_GB.UTF-8 console-setup/ask_detect=false keyboard-configuration/layoutcode=en file=file:/preseed.cfg vga=788 quiet"
   os:
     type: linux
-    variant: ubuntuutopic
+    variant: 
+      "15": ubuntuutopic
+      "16": ubuntu14.04
   virt_hypervisor: hvm
   virt_type: kvm
   disk:
