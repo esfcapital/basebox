@@ -1,0 +1,19 @@
+---
+
+- name: Get list of vms
+  local_action: virt command=list_vms
+  register: virt_vms
+
+- name: Ensure {{name}} is destroyed
+  virt: name={{name}} state=destroyed
+  when: name in virt_vms.list_vms
+
+- name: Undefine {{name}}
+  virt: name={{name}} command=undefine
+  when: name in virt_vms.list_vms
+
+- name: Ensure {{disk.image_path}} does not exist
+  become: yes
+  local_action: file path={{disk.image_path}} state=absent
+
+

@@ -3,7 +3,7 @@ d-i console-setup/ask_detect boolean false
 d-i keyboard-configuration/layoutcode string gb
 
 # Set hostname
-d-i netcfg/get_hostname string {{basebox.username}} 
+d-i netcfg/get_hostname string {{username}} 
 # Mirror
 d-i mirror/country string manual
 d-i mirror/http/hostname string gb.archive.ubuntu.com
@@ -30,10 +30,10 @@ d-i time/zone string Europe/London
 # Skip root account
 d-i passwd/root-login boolean false
 # Create new user
-d-i passwd/user-fullname string {{basebox.user}} 
-d-i passwd/username string {{basebox.username}} 
-d-i passwd/user-password password {{basebox.username}}
-d-i passwd/user-password-again password {{basebox.username}}
+d-i passwd/user-fullname string {{user}} 
+d-i passwd/username string {{username}} 
+d-i passwd/user-password password {{username}}
+d-i passwd/user-password-again password {{username}}
 d-i user-setup/allow-password-weak boolean true
 # Don't encrypt the home directory
 d-i user-setup/encrypt-home boolean false
@@ -67,10 +67,10 @@ d-i grub-installer/timeout string 2
 d-i preseed/late_command string \
     in-target sed -i 's/^%sudo.*$/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers; \
     in-target /bin/sh -c "echo 'Defaults env_keep += \"SSH_AUTH_SOCK\"' >> /etc/sudoers"; \
-    in-target mkdir -p /home/{{basebox.username}}/.ssh; \
-    in-target /bin/sh -c "echo '{{basebox.public_key}}' >> /home/{{basebox.username}}/.ssh/authorized_keys"; \
-    in-target chown -R {{basebox.username}}:{{basebox.username}} /home/{{basebox.username}}/; \
-    in-target chmod -R go-rwx /home/{{basebox.username}}/authorized_keys; \
+    in-target mkdir -p /home/{{username}}/.ssh; \
+    in-target /bin/sh -c "echo '{{public_key}}' >> /home/{{username}}/.ssh/authorized_keys"; \
+    in-target chown -R {{username}}:{{username}} /home/{{username}}/; \
+    in-target chmod -R go-rwx /home/{{username}}/authorized_keys; \
     in-target sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config; \
     in-target sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config; \
     in-target rm /etc/udev/rules.d/70-persistent-net.rules; \
