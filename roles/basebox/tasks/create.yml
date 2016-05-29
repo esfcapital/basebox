@@ -1,0 +1,58 @@
+---
+
+- name: Get list of vms
+  local_action: virt command=list_vms
+  register: virt_vms
+
+- name: Fail if {{name}} is already created
+  fail: msg="{{name}} already created. Please run make destroy first"
+  when: name in virt_vms.list_vms
+
+- name: Ensure {{disk.image_path}} does not exist if {{name}} is not defined
+  become: yes
+  local_action: file path={{disk.image_path}} state=absent
+  when: name not in virt_vms.list_vms
+
+- name: Copy Preseed to tmp
+  local_action: template src={{preseed}}.j2 dest=/tmp/{{preseed}}
+
+- name: Ensure that the disks directory exists
+  file: name={{disk.image_path | dirname}} state=directory
+
+- name: Create libvirt guests
+  local_action: command /usr/bin/virt-install --name {{name}}
+             -r {{ mem }}
+             --os-type {{os.type}}
+             --os-variant {{os.variant[ansible_lsb.major_release]}}
+             --vcpus {{ cpu }}
+             --location {{location}}
+             --initrd-inject /tmp/{{preseed}}
+             --extra-args "{{extra_args}}"
+             --network network=default
+             --graphics vnc
+             --{{virt_hypervisor}}
+             --virt-type {{ virt_type }}
+             --disk size={{disk.size}},format={{disk.format}},path={{disk.image_path}}
+             --noautoconsole
+
+- name: Get IP addresses 
+  local_action: command virsh -q domifaddr {{name}}
+  register: domifaddr
+  until: domifaddr.rc == 0 and domifaddr.stdout != ""
+  retries: 10
+  delay: 5
+
+- name: Add the VM we created (by IP address) to their group
+  local_action: add_host name={{ item | regex_replace(".*\\s+([^\\s/]+)/\\d+$", "\\1")}} groups=basebox
+  with_items: "{{domifaddr.stdout_lines}}"
+    
+- name: Wait for basebox shut down after install 
+  local_action: shell virsh dominfo {{name}} | grep -q 'shut off'
+  register: basebox_shutdown 
+  until: basebox_shutdown.rc == 0
+  retries: 1000
+  delay: 5
+
+- name: Sparsify disk image
+  become: yes
+  local_action: command virt-sparsify --in-place {{disk.image_path}}

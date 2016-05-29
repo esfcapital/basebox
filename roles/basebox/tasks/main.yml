@@ -1,61 +1,9 @@
 ---
 
-- name: Get list of vms
-  local_action: virt command=list_vms
-  register: virt_vms
-
-- name: Copy Preseed to tmp
-  local_action: template src={{basebox.preseed}}.j2 dest=/tmp/{{basebox.preseed}}
-
-- name: Ensure that the disks directory exists
-  file: name={{basebox.disk.path}} state=directory
-
-- name: Create libvirt guests
-  local_action: command /usr/bin/virt-install --name {{basebox.name}}
-             -r {{ basebox.mem }}
-             --os-type {{basebox.os.type}}
-             --os-variant {{basebox.os.variant[ansible_lsb.major_release]}}
-             --vcpus {{ basebox.cpu }}
-             --location {{basebox.location}}
-             --initrd-inject /tmp/{{basebox.preseed}}
-             --extra-args "{{basebox.extra_args}}"
-             --network network=default
-             --graphics vnc
-             --{{basebox.virt_hypervisor}}
-             --virt-type {{ basebox.virt_type }}
-             --disk size={{basebox.disk.size}},format={{basebox.disk.format}},path={{basebox.disk.path}}/{{basebox.name}}.img
-             --noautoconsole
-  when: basebox.name not in virt_vms.list_vms
-  register: basebox_create 
-
-- name: Get guest info
-  local_action: virt command=info
-  register: virt_info
-
-- name: Ensure basebox is running
-  local_action: virt name={{basebox.name}} state=running
-
-- name: Get IP addresses 
-  local_action: command virsh -q domifaddr {{basebox.name}}
-  register: domifaddr
-  until: domifaddr.stdout != ""
-  retries: 10
-  delay: 5
-
-- name: Add the VM we created (by IP address) to their group
-  local_action: add_host name={{ item | regex_replace(".*\\s+([^\\s/]+)/\\d+$", "\\1")}} groups=basebox
-  with_items: "{{domifaddr.stdout_lines}}"
-    
-- name: Status message
-  debug: msg="Your image is currently being built.  Please open you virt-manager to see progress"
-
-- name: Ensure basebox is shut down 
-  local_action: shell virsh dominfo {{basebox.name}} | grep -q 'shut off'
-  register: basebox_shutdown 
-  until: basebox_shutdown.rc == 0
-  retries: 1000
-  delay: 5
-
-- name: Sparsify disk image
-  become: yes
-  local_action: command virt-sparsify --in-place {{basebox.disk.path}}/{{basebox.name}}.img
+- name: Create basebox
+  include: create.yml
+  when: state=='present'
+  
+- name: Destroy basebox
+  include: destroy.yml
+  when: state=='absent'
