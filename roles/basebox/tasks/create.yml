@@ -50,7 +50,7 @@
   local_action: shell virsh dominfo {{name}} | grep -q 'shut off'
   register: basebox_shutdown 
   until: basebox_shutdown.rc == 0
-  retries: 1000
+  retries: 2000
   delay: 5
 
 - name: Sparsify disk image
