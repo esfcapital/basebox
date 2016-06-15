@@ -14,7 +14,7 @@
   when: name not in virt_vms.list_vms
 
 - name: Copy Preseed to tmp
-  local_action: template src={{preseed}}.j2 dest=/tmp/{{preseed}}
+  local_action: template src={{boxes[box].preseed}} dest=/tmp/{{box}}-preseed.cfg
 
 - name: Ensure that the disks directory exists
   file: name={{disk.image_path | dirname}} state=directory
@@ -22,12 +22,12 @@
 - name: Create libvirt guests
   local_action: command /usr/bin/virt-install --name {{name}}
              -r {{ mem }}
-             --os-type {{os.type}}
-             --os-variant {{os.variant[ansible_lsb.major_release]}}
+             --os-type linux 
+             --os-variant {{boxes[box].variant[ansible_lsb.major_release]}}
              --vcpus {{ cpu }}
-             --location {{location}}
-             --initrd-inject /tmp/{{preseed}}
-             --extra-args "{{extra_args}}"
+             --location {{boxes[box].location}}
+             --initrd-inject /tmp/{{box}}-preseed.cfg
+             --extra-args "{{boxes[box].extra_args}}"
              --network network=default
              --graphics vnc
              --{{virt_hypervisor}}
