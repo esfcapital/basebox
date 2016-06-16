@@ -1,23 +1,32 @@
 ---
 
-name: basebox
+
+boxes:
+  basebox:
+    location: http://gb.archive.ubuntu.com/ubuntu/dists/trusty/main/installer-amd64/
+    preseed: preseed.cfg.j2 
+    extra_args: "locale=en_GB.UTF-8 console-setup/ask_detect=false keyboard-configuration/layoutcode=en file=file:/{{box}}-preseed.cfg vga=788 quiet"
+    variant: 
+      "15": ubuntuutopic
+      "16": ubuntu14.04
+  basebox-lucid:
+    location: http://gb.archive.ubuntu.com/ubuntu/dists/lucid/main/installer-amd64/
+    preseed: preseed-lucid.cfg.j2
+    extra_args: "auto=true priority=critical preseed/locale=en_GB.UTF-8 console-setup/ask_detect=false kbd-chooser/method=en console-keymaps-at/keymap=gb url=file:///{{box}}-preseed.cfg quiet"
+    variant: 
+      "15": ubuntulucid
+      "16": ubuntu10.04
+
+name: "{{box}}"
 user: Basebox User
 username: basebox 
 password: basebox 
 public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC0ay5+8FEoPYDCAjhIBiXO6zrPAtEz7v4bz50s2LRoINWVtFnnmmBw+Nh84tdjPTIX7JVZhepWD+oc07Dd+06TTZQR4whF35DKTEv/XWstj1MflUijxT0kSSWDoULzuf0lxGyAI5u3jbUaMLhq/AthD8tTp7xkochoGDa9jkWlOHMYemHSdV4YnxmNp4hOgf+MeA3d900eWWmm8bJSO4v7g90ZtP9//5UaNb4vh6+ELDVKuMA0x1xCl9uBrKMdGUtq7Zxms6XQ5UjWOWeVMuBJATFMn3fcykwYAkFik6+ceDYcpsQPV8AdpnTkHRzPsco0a88VSL4InO8Jpa5yf4711VVOPMjXC2KJNzbzGHsovi0DiQOq9vckFA5wqbJqh90c4WnCRVklP4zziGoQvzjOAmX+l7B6eZogzSg/JeOaPGdywHHAWLtPeXXteqPpPlBkv928auZsdEUf/EiQioUqVXrow2oo73i1inuf1X6a4c83HNNLk7tlM7WmElVLE54Abyq3AXPMiBZ5uvjXARfCwvFFWbrdCidJDItyXA/DJlEot4SiP6NLcwJs0ijRR0fdp51QxpsJ+3QwfY5UFZ0hwGHGdUyGLq2au+FALrQWeYvBHchGmM+SW++GSjwWIWOBwK1ANhdnl+v6XyBCXE4dFQRTqGBWY1lGL00Carb3KQ== esfcapital basebox unsecure key
 mem: 2048
 cpu: 1
-location: http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-amd64/
-preseed: preseed.cfg 
-extra_args: "locale=en_GB.UTF-8 console-setup/ask_detect=false keyboard-configuration/layoutcode=en file=file:/preseed.cfg vga=788 quiet"
-os:
-  type: linux
-  variant: 
-    "15": ubuntuutopic
-    "16": ubuntu14.04
 virt_hypervisor: hvm
 virt_type: kvm
 disk:
   size: 50
-  image_path: "{{ansible_user_dir}}/disks/{{name}}.img" 
+  image_path: "{{ansible_user_dir}}/disks/{{box}}.img" 
   format: qcow2

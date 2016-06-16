@@ -1,0 +1,85 @@
+d-i debian-installer/locale string en_GB
+d-i console-setup/ask_detect boolean false
+d-i keyboard-configuration/layoutcode string gb
+
+# Set hostname
+d-i netcfg/get_hostname string {{username}} 
+d-i netcfg/choose_interface select eth0
+# Mirror
+d-i mirror/country string manual
+d-i mirror/http/hostname string gb.archive.ubuntu.com
+d-i mirror/http/directory string /ubuntu
+d-i mirror/http/proxy string
+
+# Partitioning
+d-i partman-auto/disk string /dev/vda
+d-i partman-auto/method string lvm
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+d-i partman-auto-lvm/guided_size string max
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+# Only ask the UTC question if there are other operating systems installed.
+d-i clock-setup/utc boolean true
+# Set timezone
+d-i time/zone string Europe/London
+
+# Skip root account
+d-i passwd/root-login boolean false
+# Create new user
+d-i passwd/user-fullname string {{user}} 
+d-i passwd/username string {{username}} 
+d-i passwd/user-password password {{username}}
+d-i passwd/user-password-again password {{username}}
+d-i user-setup/allow-password-weak boolean true
+# Don't encrypt the home directory
+d-i user-setup/encrypt-home boolean false
+
+# Install GRUB2
+d-i grub-installer/only_debian boolean true
+
+# Upgrade packages after debootstrap
+d-i pkgsel/upgrade select full-upgrade
+# Unattended security upgrades
+d-i pkgsel/update-policy select none 
+# Install OpenSSH server
+tasksel tasksel/first multiselect server, openssh-server
+# Install acpid and python
+d-i pkgsel/include string acpid python
+ 
+# Don't install kernel headers.
+d-i base-installer/kernel/headers boolean false
+# Only install basic language packs. Let tasksel ask about tasks.
+d-i pkgsel/language-pack-patterns string
+# No language support packages.
+d-i pkgsel/install-language-support boolean false
+
+# Verbose output and no boot splash screen.
+d-i debian-installer/quiet boolean false
+d-i debian-installer/splash boolean false
+# Wait for two seconds in grub
+d-i grub-installer/timeout string 2
+
+# Install Public Key
+d-i preseed/late_command string \
+    in-target sed -i 's/^%admin.*$/%admin ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers; \
+    in-target /bin/sh -c "echo 'Defaults env_keep += \"SSH_AUTH_SOCK\"' >> /etc/sudoers"; \
+    in-target mkdir -p /home/{{username}}/.ssh; \
+    in-target /bin/sh -c "echo '{{public_key}}' >> /home/{{username}}/.ssh/authorized_keys"; \
+    in-target chown -R {{username}}:{{username}} /home/{{username}}/; \
+    in-target chmod -R go-rwx /home/{{username}}/authorized_keys; \
+    in-target sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config; \
+    in-target sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config; \
+    in-target rm /etc/udev/rules.d/70-persistent-net.rules; \
+    in-target /bin/sh -c "echo acpiphp >> /etc/modules"; \
+    in-target /bin/sh -c "echo pci_hotplug >> /etc/modules"; \
+    in-target aptitude clean; \
+    in-target dd if=/dev/zero of=/EMPTY bs=1M; \
+    in-target rm -f /EMPTY;
+# Avoid that last message about the install being complete
+d-i finish-install/reboot_in_progress note
+d-i debian-installer/exit/poweroff boolean true
