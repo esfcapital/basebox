@@ -14,7 +14,7 @@
   when: name not in virt_vms.list_vms
 
 - name: Copy Preseed to tmp
-  local_action: template src={{boxes[box].preseed}} dest=/tmp/{{box}}-preseed.cfg
+  local_action: template src={{boxes[box].preseed}} dest=/tmp/preseed.cfg
 
 - name: Ensure that the disks directory exists
   file: name={{disk.image_path | dirname}} state=directory
@@ -26,7 +26,7 @@
              --os-variant {{boxes[box].variant[ansible_lsb.major_release]}}
              --vcpus {{ cpu }}
              --location {{boxes[box].location}}
-             --initrd-inject /tmp/{{box}}-preseed.cfg
+             --initrd-inject /tmp/preseed.cfg
              --extra-args "{{boxes[box].extra_args}}"
              --network network=default
              --graphics vnc
