@@ -7,7 +7,7 @@ There is a dependency on [devbox](https://github.com/esfcapital/devbox) and
 we assume that your workstation is up to date.
 
 ```
-make
+make && make BOX=basebox-lucid
 ```
 
 This will build an Ubuntu VM called *basebox* with it disks image in ~/disks/basebox.img.
