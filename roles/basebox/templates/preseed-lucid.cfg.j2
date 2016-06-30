@@ -7,9 +7,13 @@ d-i netcfg/get_hostname string {{username}}
 d-i netcfg/choose_interface select eth0
 # Mirror
 d-i mirror/country string manual
-d-i mirror/http/hostname string gb.archive.ubuntu.com
+d-i mirror/http/hostname string old-releases.ubuntu.com
 d-i mirror/http/directory string /ubuntu
 d-i mirror/http/proxy string
+
+d-i apt-setup/services-select multiselect security
+d-i apt-setup/security_host string old-releases.ubuntu.com
+d-i apt-setup/security_path string /ubuntu
 
 # Partitioning
 d-i partman-auto/disk string /dev/vda
