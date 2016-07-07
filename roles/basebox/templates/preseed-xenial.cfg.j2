@@ -64,19 +64,19 @@ d-i debian-installer/splash boolean false
 d-i grub-installer/timeout string 2
 
 # Install Public Key
-#d-i preseed/late_command string \
-#    in-target sed -i 's/^%sudo.*$/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers; \
-#    in-target /bin/sh -c "echo 'Defaults env_keep += \"SSH_AUTH_SOCK\"' >> /etc/sudoers"; \
-#    in-target mkdir -p /home/{{username}}/.ssh; \
-#    in-target /bin/sh -c "echo '{{public_key}}' >> /home/{{username}}/.ssh/authorized_keys"; \
-#    in-target chown -R {{username}}:{{username}} /home/{{username}}/; \
-#    in-target chmod -R go-rwx /home/{{username}}/authorized_keys; \
-#    in-target sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config; \
-#    in-target sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config; \
-#    in-target rm /etc/udev/rules.d/70-persistent-net.rules; \
-#    in-target aptitude clean; \
-#    in-target dd if=/dev/zero of=/EMPTY bs=1M; \
-#    in-target rm -f /EMPTY;
+d-i preseed/late_command string \
+    in-target sed -i 's/^%sudo.*$/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers; \
+    in-target /bin/sh -c "echo 'Defaults env_keep += \"SSH_AUTH_SOCK\"' >> /etc/sudoers"; \
+    in-target mkdir -p /home/{{username}}/.ssh; \
+    in-target /bin/sh -c "echo '{{public_key}}' >> /home/{{username}}/.ssh/authorized_keys"; \
+    in-target chown -R {{username}}:{{username}} /home/{{username}}/; \
+    in-target chmod -R go-rwx /home/{{username}}/authorized_keys; \
+    in-target sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin no/g' /etc/ssh/sshd_config; \
+    in-target sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config; \
+    in-target rm /etc/udev/rules.d/70-persistent-net.rules; \
+    in-target aptitude clean; \
+    in-target dd if=/dev/zero of=/EMPTY bs=1M; \
+    in-target rm -f /EMPTY;
 # Avoid that last message about the install being complete
 d-i finish-install/reboot_in_progress note
 d-i debian-installer/exit/poweroff boolean true
