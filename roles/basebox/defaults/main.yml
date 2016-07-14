@@ -21,8 +21,8 @@ boxes:
       preseed: preseed-xenial.cfg.j2
       extra_args: "auto=true priority=critical preseed/locale=en_GB.UTF-8 console-setup/ask_detect=false kbd-chooser/method=en console-keymaps-at/keymap=gb url=file:///preseed.cfg quiet"
       variant:
-        "15": ubuntuutopic
-        "16": ubuntu14.04
+        "15": ubuntuxenial
+        "16": ubuntu16.04
 
 name: "{{box}}"
 user: Basebox User
