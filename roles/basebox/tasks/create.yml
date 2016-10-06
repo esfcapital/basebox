@@ -17,7 +17,7 @@
   local_action: template src={{boxes[box].preseed}} dest=/tmp/preseed.cfg
 
 - name: Ensure that the disks directory exists
-  file: name={{disk.image_path | dirname}} state=directory
+  file: name={{disk.image_path | dirname}} state=directory follow=true
 
 - name: Create libvirt guests
   local_action: command /usr/bin/virt-install --name {{name}}
