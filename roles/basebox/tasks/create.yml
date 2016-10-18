@@ -45,7 +45,12 @@
 - name: Add the VM we created (by IP address) to their group
   local_action: add_host name={{ item | regex_replace(".*\\s+([^\\s/]+)/\\d+$", "\\1")}} groups=basebox
   with_items: "{{domifaddr.stdout_lines}}"
-    
+
+- name: Copy /sbin/start-stop-daemon
+  copy: src=/sbin/start-stop-daemon dest=/sbin/start-stop-daemon
+  register: start-stop-daemon
+  ignore_errors: true
+
 - name: Wait for basebox shut down after install 
   local_action: shell virsh dominfo {{name}} | grep -q 'shut off'
   register: basebox_shutdown 
