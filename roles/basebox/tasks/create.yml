@@ -25,6 +25,7 @@
              --os-type linux 
              --os-variant {{boxes[box].variant[ansible_lsb.major_release]}}
              --vcpus {{ cpu }}
+             --cpu SandyBridge
              --location {{boxes[box].location}}
              --initrd-inject /tmp/preseed.cfg
              --extra-args "{{boxes[box].extra_args}}"
